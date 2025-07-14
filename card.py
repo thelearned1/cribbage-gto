@@ -22,12 +22,23 @@ RANKS = [
 	{'name': 'king', 'symbol': 'K', 'value': 12},
 ]
 
+def suit_of(card: int):
+	if card > 51 or card < 0:
+		raise ValueError(f"Input must be in the range [0, 52) (got {card})")
+	return card // 13
+
+def rank_of(card: int):
+	if card > 51 or card < 0:
+		raise ValueError(f"Input must be in the range [0, 52) (got {card})")
+	return card % 13
+
+
 def card_data(card: int):
 	if card > 51 or card < 0:
 		raise ValueError(f"Input must be in the range [0, 52) (got {card})")
 	
-	suit = SUITS[(card // 13)]
-	rank = RANKS[(card % 13)]
+	suit = SUITS[(suit_of(card))]
+	rank = RANKS[(rank_of(card))]
 	return {'suit': suit, 'rank': rank}
 
 def card_to_symbol(card: int):
@@ -40,5 +51,7 @@ def card_to_rank_value(card: int):
 __all__ = [
 	'card_data',
 	'card_to_symbol',
-	'card_to_rank_value'
+	'card_to_rank_value',
+	'suit_of',
+	'rank_of'
 ]
