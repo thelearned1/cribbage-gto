@@ -73,30 +73,40 @@ def score_hand (sorted_cards):
 		score_fifteens(sorted_cards)
 	)
 
+def score_sflush (hand, cut_index, is_crib=False):
+	first_suit = card_transformer.suit_of(hand[0])
+	cut_matches = True
+	is_flush = True
+	for i in range (1, len(hand)):
+		suit = card_transformer.suit_of(hand[i])
+		if suit != first_suit:
+			if i == cut_index:
+				cut_matches = False
+			is_flush = False
+
+	if is_crib:
+		return 5 if is_flush and cut_matches else 0
+	else:
+		if is_flush:
+			return 5 if cut_matches else 4
+		else:
+			return 0
+	
+def score_sknobs (hand, cut_index, is_crib=False, crib_allows_knobs=True):
+	for i in range(1, len(hand)):
+		suit = card_transformer.suit_of(hand[i])
+		if card_transformer.rank_of(hand[i]) == 10 and i != cut_index: # is a jack
+			if suit == card_transformer.suit_of(hand[cut_index]) and (not is_crib or crib_allows_knobs):
+				return 1
+	return 0
+
 def score_shand (hand, cut_index, is_crib=False, crib_allows_knobs=True):
 	score = score_cache.sget_score(hand)
 	if score is not None:
 		return score
 	
-	score = score_cache.get_score([card_transformer.rank_of(card) for card in hand])
-
-	is_flush = True
-	cut_matches = True
-	first_suit = card_transformer.suit_of(hand[0])
-
-	for i in range(1, len(hand)):
-		suit = card_transformer.suit_of(hand[i])
-		if suit != first_suit:
-			if i == cut_index:
-				cut_matches = False
-			else: 
-				is_flush = False
-		if card_transformer.rank_of(hand[i]) == 10 and i != cut_index: # is a jack
-			if suit == card_transformer.suit_of(hand[cut_index]) and (not is_crib or crib_allows_knobs):
-				score+=1 # knobs
-
-	if is_flush:
-		score += (5 if cut_matches else 4)
-
-	score_cache.sset_cache(hand, score)
-	return score
+	return (
+		score_cache.get_score([card_transformer.rank_of(card) for card in hand])
+		+ score_sflush(hand, cut_index, is_crib)
+		+ score_sknobs(hand, cut_index, is_crib, crib_allows_knobs)
+	)
