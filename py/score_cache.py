@@ -17,7 +17,7 @@ def cache_scores(d):
 
 		for key, value in d.items():
 			value['key'] = key
-			hand = hand_to_int.int_to_hand(key)
+			hand = hand_to_int.shand_to_sint(key)
 			for i in range(len(hand)):
 				value[f"card {i}"] = hand[i]
 			writer.writerow(value)
@@ -32,12 +32,12 @@ def load_scores_cache():
 
 def get_score(sorted_hand):
 	i = hand_to_int.hand_to_int(sorted_hand)
-	if i in CACHED_SUITFUL_SCORES:
-		return CACHED_SUITFUL_SCORES[i]
+	if i in CACHED_SUITLESS_SCORES:
+		return CACHED_SUITLESS_SCORES[i]
 	else:
 		raise ValueError(f"is sorted_hand unsorted? got {sorted_hand}, converted to int {i}")
 
-def sget_score(sorted_hand, cut_index, is_crib=False, crib_allows_knobs=True):
+def sget_score(sorted_hand):
 	i = hand_to_int.shand_to_sint(sorted_hand)
 	if i in CACHED_SUITFUL_SCORES:
 		return CACHED_SUITFUL_SCORES[i]
